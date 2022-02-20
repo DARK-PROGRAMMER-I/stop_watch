@@ -147,7 +147,8 @@ class StopWatchState extends State<StopWatch>{
       showTrackOnHover: true,
       child: ListView.builder(
           controller: scrollController,
-          cacheExtent: itemsHeight,
+          // cacheExtent: itemsHeight,
+          itemExtent: itemsHeight,
           itemCount: laps.length,
           itemBuilder: (context, index){
             final  miliseconds= laps[index];
