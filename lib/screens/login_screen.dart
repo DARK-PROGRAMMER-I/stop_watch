@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stop_watch/main_classes/stopwatch.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -7,9 +8,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  // create a variable to check if the user is already logged in or not
-  bool loggedIn = false;
-  String? name;
   // Adding Text controllers
   final _nameController= TextEditingController();
   final _emailController= TextEditingController();
@@ -23,21 +21,12 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Color(0xff3eb489),
       ),
       body: Center(
-        child: loggedIn ?  _buildSuccess(): _buildLoginForm(), //
+        child: _buildLoginForm(), //
       ),
     );
   }
 
-  Widget _buildSuccess() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Icon(Icons.check_circle_outline, color: Color(0xff3eb489),),
-        SizedBox(height: 10,),
-        Text("Hi $name"),
-      ],
-    );
-  }
+
   Widget _buildLoginForm(){
     return Form(
         key: _formKey,
@@ -93,16 +82,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     );
   }
-
+// Form Validator Function
   void _validate() {
     final form = _formKey.currentState;
     if(!form!.validate()){
       return;
     }
-
-    setState(() {
-      loggedIn = true;
-      name = _nameController.text;
-    });
+    final name= _nameController.text;
+    final email= _emailController.text;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => StopWatch(name: name,email: email)
+      )
+    );
   }
 }

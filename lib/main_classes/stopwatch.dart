@@ -1,15 +1,26 @@
+// import 'dart:async';
+// // import 'dart:ffi';
+
 import 'dart:async';
-// import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:stop_watch/main_classes/platform_alert.dart';
 
 class StopWatch extends StatefulWidget{
+  //constructor with name and email parameters
+  final String? email;
+  final String? name;
+  StopWatch({this.name , this.email});
+
   @override
   State createState() => StopWatchState();
 }
 
 class StopWatchState extends State<StopWatch>{
+
+
+
   // Now we need to create Seconds and timer
   bool? isStart = false;
   int? miliseconds= 0;
@@ -51,15 +62,48 @@ class StopWatchState extends State<StopWatch>{
   }
 
   // Stop Timer
-  void _stopTimer(){
+  // We will update the _stopTimer function so that it should accept build context
+  void _stopTimer(BuildContext context){
     setState((){
       // miliseconds= 0;
       timer!.cancel();
       isStart = false;
 
     });
-  }
+    // here we will write code for Alert Dialog
+    // final initial_value= miliseconds;
+    // var total_sec = laps.fold<int>(0, (total,lap) => total + lap);
+    // final alert= PlatformAlert( // here we are declaring "alert" as a class's Object
+    //     title: 'Finished',
+    //     message: 'Laps Total : ${_secondsText(total_sec)} seconds.' ,
+    // );
+    // alert.show(context); // calling function from class's object
 
+    //Here we will call for Bottom Sheet
+    final controller =  showBottomSheet(context: context,
+                        builder: _buildRunCompleteSheet);
+    Future.delayed(Duration(seconds: 3)).then((_) => controller.close());
+  }
+  // now instead of showing Alert Dialog, we will show bottom sheet
+  Widget _buildRunCompleteSheet(BuildContext context ){
+    var totalRunTime= laps.fold<int>(miliseconds!, (total, lap) => total + lap);
+
+    return Container(
+      color: Color(0xff3eb489),
+      width: double.infinity,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 30),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Run Finished 🎇 ", style: TextStyle(fontSize: 17)),
+            SizedBox(height: 10,),
+            Text("Total Runtime: ${_secondsText(totalRunTime)} " , style: TextStyle(fontSize: 15),)
+          ],
+        ),
+      ),
+    );
+  }
 
   // Creating dynamic text -> use infront of seconds
   String _secondsText(int miliseconds){
@@ -71,8 +115,17 @@ class StopWatchState extends State<StopWatch>{
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xff3eb489),
-        title: Text("Stop Watch", style: TextStyle(color: Colors.white),),
+        // backgroundColor: Color(0xff3eb489),
+        backgroundColor: Colors.white70,
+
+      title: Text("${widget.name}", style: TextStyle(color: Color(0xff3eb489),)),
+
+        actions: [
+          Container(
+              width: 100,
+              height: 150,
+              child: Image.asset('assets/web-logo.png'))
+        ],
       ),
       body:  Column(
         children: [
@@ -127,15 +180,17 @@ class StopWatchState extends State<StopWatch>{
                 child: Text("Lap", style: TextStyle(fontSize: 16),)
             ),
             SizedBox(width: 20,),
-            TextButton(
-                onPressed: isStart == true? _stopTimer: null,
-                child: Text('Stop'),
-                style: ButtonStyle(
-                  foregroundColor: MaterialStateProperty.all(Colors.white),
-                  backgroundColor: MaterialStateProperty.all(Colors.red),
-                  padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 30))
-                ),
+            Builder(
+              builder: (context) => TextButton(
+                  onPressed: isStart == true? () => _stopTimer(context): null,
+                  child: Text('Stop'),
+                  style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    backgroundColor: MaterialStateProperty.all(Colors.red),
+                    padding: MaterialStateProperty.all(EdgeInsets.symmetric(horizontal: 30))
+                  ),
 
+              ),
             )
 
           ],
